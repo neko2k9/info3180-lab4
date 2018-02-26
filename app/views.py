@@ -6,8 +6,12 @@ This file creates your application.
 """
 import os
 from app import app
-from flask import render_template, request, redirect, url_for, flash, session, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
+from forms import UploadForm
+
+rootdir = os.getcwd()
+print rootdir 
 
 
 ###
@@ -30,17 +34,29 @@ def about():
 def upload():
     if not session.get('logged_in'):
         abort(401)
-
     # Instantiate your form class
-
+    form = UploadForm()
     # Validate file upload on submit
     if request.method == 'POST':
+        if form.validate_on_submit():
         # Get file data and save to your uploads folder
+            file = form.upload.data
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File Saved', 'success')
+            return redirect(url_for('home'))
 
-        flash('File Saved', 'success')
-        return redirect(url_for('home'))
-
-    return render_template('upload.html')
+    return render_template('upload.html', form=form)
+    
+@app.route('/app/static/uploads')
+def get_uploaded_images(filename):
+    return 
+    
+    
+@app.route('/files')
+def files():
+    image_names = os.listdir('./app/static/uploads')
+    return render_template("files.html", image_names=image_names)
 
 
 @app.route('/login', methods=['POST', 'GET'])
