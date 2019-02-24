@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
 {% block main %}
-
+<div class="grid-wrapper">
+{% for photo in photos %}
+    <div class="grid-item">
+      <img src="{{ url_for('static', filename='uploads/' + photo) }}"></img>  
+    </div>
+{% endfor %}
+</div>
 {% endblock %}
